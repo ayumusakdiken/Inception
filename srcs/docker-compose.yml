@@ -2,32 +2,45 @@ name: inception
 
 services:
   nginx:
+    container_name: nginx
     build: ./requirements/nginx/
     depends_on:
       - mariadb
-    volumes:
-      - ./exam:/wp_db
     ports:
-      - "443:80"
-      - "9000:80"
-  wp:
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html/
+    env_file:
+      - .env
+    networks:
+      - wp_network
+  wordpress:
+    container_name: wordpress
     build: requirements/wordpress/
     depends_on:
       - nginx
       - mariadb
     volumes:
-      - ./exam:/wp_db
-    ports:
-      - "83:80"
+      - wordpress_data:/var/www/html/
+    env_file:
+      - .env
+    networks:
+      - wp_network
   mariadb:
+    container_name: mariadb
     build: requirements/mariadb/
     volumes:
-      - ./exam:/db
-    ports:
-      - "82:3306"
+      - db:/var/lib/mysql
+    env_file:
+      - .env
+    networks:
+      - wp_network
 
 volumes:
     db:
-    wp_db:
-
-
+      driver: local
+    wordpress_data:
+      driver: local
+networks:
+    wp_network:
+      driver: bridge

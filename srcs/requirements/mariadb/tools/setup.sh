@@ -1,12 +1,16 @@
+#!/bin/bash
+
 export $(grep -v '^#' .env | xargs)
 
 cat <<EOF > setup.sql
-CREATE DATABASE wordpress;
-CREATE USER '${WORDPRESS_USER}'@'localhost' IDENTIFIED BY '${WORDPRESS_PASSWORD}';
-GRANT ALL PRIVILEGES ON wordpress.* TO '${WORDPRESS_USER}'@'localhost';
+CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'172.%.%.%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'172.%.%.%';
 FLUSH PRIVILEGES;
 EOF
 
-mysql -u root -p < setup.sql
+mysql -u root < setup.sql
 
 rm setup.sql
+
+exec mysqld_safe
