@@ -4,10 +4,7 @@ COMPOSE = ./srcs/
 UP = docker compose up -d
 DOWN = docker compose down
 
-CLEAR_CONTAINER = docker container prune -f
-CLEAR_NETWORK = docker network prune -f
-CLEAR_VOLUME = docker volume prune -af
-CLEAR_IMAGE = docker image prune -af
+CLEAN = docker compose down --rmi all --volumes --remove-orphans
 
 up:
 	$(CD) $(COMPOSE) && $(UP)
@@ -15,12 +12,9 @@ up:
 down:
 	$(CD) $(COMPOSE) && $(DOWN)
 
-clear: $(DOWN)
-	$(CLEAR_CONTAINER) && $(CLEAR_VOLUME) && $(CLEAR_NETWORK)
+clean:
+	$(CD) $(COMPOSE) && $(CLEAN)
 
-fclear: clear
-	$(CLEAR_IMAGE)
+re: clean up
 
-re: fclean up
-
-.PHONY: up down fclean clean re
+.PHONY: up down clean re
